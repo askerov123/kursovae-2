@@ -1,1 +1,632 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дипломная работа - Интерактивный конструктор интерфейса</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #f9f9f9;
+            --text-color: #333333;
+            --accent-color: #e74c3c;
+            --cursor-style: default;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            transition: all 0.3s ease;
+            cursor: var(--cursor-style);
+            line-height: 1.6;
+        }
+
+        .child-mode {
+            --primary-color: #ff6b6b;
+            --secondary-color: #4ecdc4;
+            --background-color: #ffeaa7;
+            --text-color: #2d3436;
+            --accent-color: #fd79a8;
+        }
+
+        .child-mode body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+
+        .color-palette {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.active {
+            border-color: var(--text-color);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-right: 10px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .cursor-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .cursor-option {
+            padding: 10px 15px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .cursor-option:hover {
+            background-color: var(--primary-color);
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .card h3 i {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+
+        .program-icon {
+            font-size: 2rem;
+            margin-right: 10px;
+            display: inline-block;
+            width: 40px;
+            text-align: center;
+        }
+
+        .program-features {
+            margin-top: 15px;
+        }
+
+        .program-features li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .program-features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .student-info {
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+
+        /* Стили для курсоров */
+        .cursor-default {
+            cursor: default;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .cursor-crosshair {
+            cursor: crosshair;
+        }
+
+        .cursor-text {
+            cursor: text;
+        }
+
+        .cursor-wait {
+            cursor: wait;
+        }
+
+        .cursor-help {
+            cursor: help;
+        }
+
+        .cursor-grab {
+            cursor: grab;
+        }
+
+        .cursor-zoom-in {
+            cursor: zoom-in;
+        }
+
+        /* Анимации для детского режима */
+        .child-mode .card {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .child-mode .color-option {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .program-category {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px dashed var(--secondary-color);
+        }
+
+        .program-category h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Дипломная работа</h1>
+            <div class="subtitle">Интерактивный конструктор интерфейса</div>
+            <div class="student-info">Студент 3 курса, Веб-дизайн, Академия НАДИП</div>
+        </header>
+
+        <section class="controls">
+            <div class="control-group">
+                <h2>Цветовая схема</h2>
+                <div class="color-palette">
+                    <div class="color-option active" style="background-color: #3498db;" data-color="blue"></div>
+                    <div class="color-option" style="background-color: #2ecc71;" data-color="green"></div>
+                    <div class="color-option" style="background-color: #e74c3c;" data-color="red"></div>
+                    <div class="color-option" style="background-color: #9b59b6;" data-color="purple"></div>
+                    <div class="color-option" style="background-color: #f39c12;" data-color="orange"></div>
+                    <div class="color-option" style="background-color: #1abc9c;" data-color="turquoise"></div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h2>Детский режим</h2>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="child-mode-toggle">
+                    <span class="slider"></span>
+                </label>
+                <span>Включить детский режим</span>
+            </div>
+
+            <div class="control-group">
+                <h2>Стиль курсора</h2>
+                <div class="cursor-options">
+                    <button class="cursor-option" data-cursor="default">Обычный</button>
+                    <button class="cursor-option" data-cursor="pointer">Указатель</button>
+                    <button class="cursor-option" data-cursor="crosshair">Прицел</button>
+                    <button class="cursor-option" data-cursor="text">Текст</button>
+                    <button class="cursor-option" data-cursor="wait">Ожидание</button>
+                    <button class="cursor-option" data-cursor="help">Помощь</button>
+                    <button class="cursor-option" data-cursor="grab">Захват</button>
+                    <button class="cursor-option" data-cursor="zoom-in">Увеличение</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="content">
+            <div class="card">
+                <h3><i class="fas fa-info-circle"></i> О проекте</h3>
+                <p>Данный сайт является дипломной работой студента 3 курса направления "Веб-дизайн" в академии НАДИП. Проект демонстрирует возможности кастомизации пользовательского интерфейса в реальном времени.</p>
+            </div>
+            <div class="card">
+                <h3><i class="fas fa-cogs"></i> Функциональность</h3>
+                <p>На сайте реализованы следующие возможности:</p>
+                <ul>
+                    <li>Изменение цветовой схемы интерфейса</li>
+                    <li>Включение/выключение детского режима</li>
+                    <li>Изменение стиля курсора мыши</li>
+                    <li>Адаптивный дизайн для различных устройств</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3><i class="fas fa-code"></i> Технологии</h3>
+                <p>При разработке использовались:</p>
+                <ul>
+                    <li>HTML5 для структуры сайта</li>
+                    <li>CSS3 для стилизации и анимаций</li>
+                    <li>JavaScript для интерактивности</li>
+                    <li>CSS переменные для динамического изменения стилей</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="program-category">
+            <h2>Программы для веб-дизайна</h2>
+            <div class="content">
+                <div class="card">
+                    <h3><i class="fab fa-figma program-icon"></i> Figma</h3>
+                    <p>Figma — это облачный редактор для совместной работы над интерфейсами, прототипами и дизайн-системами.</p>
+                    <div class="program-features">
+                        <ul>
+                            <li>Совместная работа в реальном времени</li>
+                            <li>Авто-макеты (Auto Layout)</li>
+                            <li>Компоненты и стили</li>
+                            <li>Интерактивные прототипы</li>
+                            <li>Плагины и интеграции</li>
+                            <li>Векторные сети (Vector Networks)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3><i class="fab fa-adobe program-icon"></i> Adobe XD</h3>
+                    <p>Adobe XD — инструмент для проектирования пользовательских интерфейсов и создания прототипов от Adobe.</p>
+                    <div class="program-features">
+                        <ul>
+                            <li>Повторяющиеся сетки (Repeat Grid)</li>
+                            <li>Голосовые прототипы</li>
+                            <li>Авто-анимация</li>
+                            <li>Интеграция с Creative Cloud</li>
+                            <li>Совместная работа</li>
+                            <li>Плагины и расширения</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-pen-nib program-icon"></i> Sketch</h3>
+                    <p>Sketch — векторный графический редактор для дизайнеров интерфейсов и экранного дизайна.</p>
+                    <div class="program-features">
+                        <ul>
+                            <li>Символы и переопределения</li>
+                            <li>Библиотеки символов</li>
+                            <li>Векторное редактирование</li>
+                            <li>Экспорт кода</li>
+                            <li>Прототипирование</li>
+                            <li>Большое сообщество и плагины</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="program-category">
+            <h2>Программы для 3D-графики</h2>
+            <div class="content">
+                <div class="card">
+                    <h3><i class="fas fa-cube program-icon"></i> Blender</h3>
+                    <p>Blender — бесплатное программное обеспечение для создания трёхмерной компьютерной графики.</p>
+                    <div class="program-features">
+                        <ul>
+                            <li>Моделирование, скульптинг и текстурирование</li>
+                            <li>Анимация и риггинг</li>
+                            <li>Визуализация (рендеринг)</li>
+                            <li>Композитинг и видеомонтаж</li>
+                            <li>Симуляции (физика, жидкости, ткани)</li>
+                            <li>Полностью бесплатный и с открытым исходным кодом</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-film program-icon"></i> Cinema 4D</h3>
+                    <p>Cinema 4D — профессиональная программа для создания трёхмерной графики и анимации.</p>
+                    <div class="program-features">
+                        <ul>
+                            <li>Мощное моделирование</li>
+                            <li>Продвинутая анимация</li>
+                            <li>Динамика и симуляции</li>
+                            <li>Интеграция с Adobe After Effects</li>
+                            <li>Модульная система</li>
+                            <li>BodyPaint 3D для текстур</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-drafting-compass program-icon"></i> 3ds Max</h3>
+                    <p>3ds Max — программное обеспечение для 3D-моделирования, анимации и визуализации от Autodesk.</p>
+                    <div class="program-features">
+                        <ul>
+                            <li>Полигональное моделирование</li>
+                            <li>Средства анимации</li>
+                            <li>Арнольд рендерер</li>
+                            <li>Инструменты для архитектурной визуализации</li>
+                            <li>Динамика и симуляции</li>
+                            <li>Поддержка скриптинга</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="program-category">
+            <h2>Другие программы для дизайна</h2>
+            <div class="content">
+                <div class="card">
+                    <h3><i class="fab fa-adobe program-icon"></i> Adobe Photoshop</h3>
+                    <p>Мощный редактор растровой графики для обработки фотографий и создания цифровых изображений.</p>
+                    <div class="program-features">
+                        <ul>
+                            <li>Расширенные инструменты ретуши</li>
+                            <li>Работа со слоями и масками</li>
+                            <li>Фильтры и эффекты</li>
+                            <li>Типографика и текст</li>
+                            <li>Поддержка 3D-объектов</li>
+                            <li>Интеграция с другими продуктами Adobe</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3><i class="fab fa-adobe program-icon"></i> Adobe Illustrator</h3>
+                    <p>Профессиональный редактор векторной графики для создания логотипов, иконок и иллюстраций.</p>
+                    <div class="program-features">
+                        <ul>
+                            <li>Точное векторное редактирование</li>
+                            <li>Инструменты для типографики</li>
+                            <li>Градиенты и прозрачность</li>
+                            <li>Работа с кистями и символами</li>
+                            <li>Эффекты и стили</li>
+                            <li>Экспорт в различные форматы</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-paint-brush program-icon"></i> Affinity Designer</h3>
+                    <p>Мощный векторный графический редактор от Serif с поддержкой растровых кистей.</p>
+                    <div class="program-features">
+                        <ul>
+                            <li>Гибридный векторно-растровый workflow</li>
+                            <li>Высокая производительность</li>
+                            <li>Точные инструменты векторного редактирования</li>
+                            <li>Поддержка PANTONE® и ICC-профилей</li>
+                            <li>Экспорт в SVG, PDF, EPS и другие форматы</li>
+                            <li>Доступная цена без подписки</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>Дипломная работа студента 3 курса</p>
+            <p>Направление: Веб-дизайн</p>
+            <p>Академия НАДИП, 2023</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы управления
+            const colorOptions = document.querySelectorAll('.color-option');
+            const childModeToggle = document.getElementById('child-mode-toggle');
+            const cursorOptions = document.querySelectorAll('.cursor-option');
+            
+            // Цветовые схемы
+            const colorSchemes = {
+                blue: {
+                    primary: '#3498db',
+                    secondary: '#2ecc71',
+                    background: '#f9f9f9',
+                    text: '#333333',
+                    accent: '#e74c3c'
+                },
+                green: {
+                    primary: '#2ecc71',
+                    secondary: '#3498db',
+                    background: '#ecf0f1',
+                    text: '#2c3e50',
+                    accent: '#e74c3c'
+                },
+                red: {
+                    primary: '#e74c3c',
+                    secondary: '#3498db',
+                    background: '#fdf2f2',
+                    text: '#2c3e50',
+                    accent: '#2ecc71'
+                },
+                purple: {
+                    primary: '#9b59b6',
+                    secondary: '#3498db',
+                    background: '#f5eef8',
+                    text: '#2c3e50',
+                    accent: '#e74c3c'
+                },
+                orange: {
+                    primary: '#f39c12',
+                    secondary: '#3498db',
+                    background: '#fef9e7',
+                    text: '#2c3e50',
+                    accent: '#e74c3c'
+                },
+                turquoise: {
+                    primary: '#1abc9c',
+                    secondary: '#3498db',
+                    background: '#e8f8f5',
+                    text: '#2c3e50',
+                    accent: '#e74c3c'
+                }
+            };
+
+            // Обработчики событий для цветовых схем
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Удаляем активный класс у всех опций
+                    colorOptions.forEach(opt => opt.classList.remove('active'));
+                    // Добавляем активный класс к выбранной опции
+                    this.classList.add('active');
+                    
+                    // Получаем выбранную цветовую схему
+                    const colorScheme = colorSchemes[this.dataset.color];
+                    
+                    // Применяем цветовую схему
+                    document.documentElement.style.setProperty('--primary-color', colorScheme.primary);
+                    document.documentElement.style.setProperty('--secondary-color', colorScheme.secondary);
+                    document.documentElement.style.setProperty('--background-color', colorScheme.background);
+                    document.documentElement.style.setProperty('--text-color', colorScheme.text);
+                    document.documentElement.style.setProperty('--accent-color', colorScheme.accent);
+                });
+            });
+
+            // Обработчик для детского режима
+            childModeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.classList.add('child-mode');
+                } else {
+                    document.body.classList.remove('child-mode');
+                }
+            });
+
+            // Обработчики для стилей курсора
+            cursorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const cursorStyle = this.dataset.cursor;
+                    document.documentElement.style.setProperty('--cursor-style', cursorStyle);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
